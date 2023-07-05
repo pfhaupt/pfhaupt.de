@@ -8,8 +8,12 @@ const GRID_WIDTH = 50;
 const GRID_HEIGHT = GRID_WIDTH;
 const POINT_SIZE = 10;
 
+const UPDATE_COUNT = 10;
+
 const nodes = [];
 const springs = [];
+
+let gravity;
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
@@ -20,13 +24,21 @@ function setup() {
     let n2 = new Node(100, 50);
     let n3 = new Node(50, 100);
     let n4 = new Node(100, 100);
-    nodes.push(n1, n2, n3, n4);
+    let n5 = new Node(300, 300);
+    nodes.push(n1, n2, n3, n4, n5);
 
     let s1 = new Spring(n1, n2);
     let s2 = new Spring(n2, n4);
     let s3 = new Spring(n4, n3);
     let s4 = new Spring(n3, n1);
-    springs.push(s1, s2, s3, s4);
+    let s5 = new Spring(n1, n4);
+    let s6 = new Spring(n2, n3);
+    let s7 = new Spring(n4, n5);
+    springs.push(s1, s2, s3, s4, s5, s6, s7);
+
+    gravity = createVector(0, 0.05);
+
+    n5.frozen = true;
 }
 
 function draw() {
@@ -47,10 +59,19 @@ function draw() {
     for (let node of nodes) {
         node.draw(this);
     }
-
     for (let spring of springs) {
         spring.draw(this);
     }
+    for (let i = 0; i < UPDATE_COUNT; i++) {
+        for (let spring of springs) {
+            spring.update();
+        }
+        for (let node of nodes) {
+            node.applyForce(gravity);
+            node.update();
+        }
+    }
+
     avgFrames = avgFrames * AVG_WEIGHT + frameRate() * CURR_WEIGHT;
 }
 

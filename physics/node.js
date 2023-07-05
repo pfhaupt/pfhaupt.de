@@ -1,15 +1,34 @@
 
 class Node {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+    constructor(x, y, mass = 1) {
+        this.position = createVector(x, y);
+        this.velocity = createVector(0, 0);
+        this.acceleration = createVector(0, 0);
+        this.connected = [];
+        this.frozen = false;
+        this.mass = mass;
+    }
+
+    applyForce(force) {
+        let f = force.copy();
+        f.div(this.mass);
+        this.acceleration.add(f);
+    }
+
+    update() {
+        if (!this.frozen) {
+            this.velocity.mult(0.999); // Friction
+            this.velocity.add(this.acceleration);
+            this.position.add(this.velocity);
+            this.acceleration.mult(0);
+        }
     }
 
     draw(canvas) {
         canvas.push();
         canvas.strokeWeight(4);
         canvas.stroke(255);
-        canvas.point(this.x, this.y);
+        canvas.point(this.position.x, this.position.y);
         canvas.pop();
     }
 }
