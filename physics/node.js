@@ -6,6 +6,7 @@ class Node {
         this.acceleration = createVector(0, 0);
         this.connected = [];
         this.frozen = false;
+        this.selected = false; // for spring creation
         this.mass = mass;
     }
 
@@ -26,10 +27,18 @@ class Node {
 
     draw(canvas) {
         canvas.push();
-        canvas.strokeWeight(4);
-        if (this.frozen) canvas.stroke(0, 0, 255);
+        canvas.strokeWeight(NODE_SIZE);
+        if (this.selected) canvas.stroke(0, 255, 0);
+        else if (this.frozen) canvas.stroke(0, 0, 255);
         else canvas.stroke(255);
         canvas.point(this.position.x, this.position.y);
         canvas.pop();
+    }
+
+    equals(other) {
+        if (other === null) return false;
+        if (!(other instanceof Node)) return false;
+        if (this === other) return true;
+        return dist(this.position.x, this.position.y, other.position.x, other.position.y) <= NODE_SIZE;
     }
 }

@@ -25,4 +25,14 @@ class Spring {
         force.mult(-1);
         this.end.applyForce(force);
     }
+
+    equals(other) {
+        if (other === null) return false;
+        if (!(other instanceof Spring)) return false;
+        if (this === other) return true;
+        let option1 = this.start.equals(other.start) && this.end.equals(other.end);
+        if (option1) return true;
+        let option2 = this.start.equals(other.end) && this.end.equals(other.start);
+        return option2;
+    }
 }

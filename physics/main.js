@@ -3,13 +3,25 @@ const AVG_WEIGHT = 0.9;
 const CURR_WEIGHT = 1 - AVG_WEIGHT;
 
 let showGrid = true;
-let update = true;
+let update = false;
 
 const GRID_WIDTH = 50;
 const GRID_HEIGHT = GRID_WIDTH;
 const POINT_SIZE = 10;
 
-const UPDATE_COUNT = 1;
+const NODE_SIZE = 15;
+
+const UPDATE_COUNT = 10;
+
+const Mode = {
+    NONE: 0,
+    CREATE_NODE: 1,
+    FREEZE_NODE: 2,
+    CREATE_SPRING: 3
+}
+const MODE_COUNT = 4;
+
+let mode = Mode.NONE;
 
 const nodes = [];
 const springs = [];
@@ -22,23 +34,23 @@ function setup() {
     textSize(18);
 
     // Hardcoded test - Next step: Click on grid to place Nodes
-    let n1 = new Node(50, 50);
-    let n2 = new Node(100, 50);
-    let n3 = new Node(50, 100);
-    let n4 = new Node(100, 100);
-    let n5 = new Node(300, 300);
-    nodes.push(n1, n2, n3, n4, n5);
+    // let n1 = new Node(50, 50);
+    // let n2 = new Node(100, 50);
+    // let n3 = new Node(50, 100);
+    // let n4 = new Node(100, 100);
+    // let n5 = new Node(300, 300);
+    // nodes.push(n1, n2, n3, n4, n5);
 
-    let s1 = new Spring(n1, n2);
-    let s2 = new Spring(n2, n4);
-    let s3 = new Spring(n4, n3);
-    let s4 = new Spring(n3, n1);
-    let s5 = new Spring(n1, n4);
-    let s6 = new Spring(n2, n3);
-    let s7 = new Spring(n4, n5);
-    springs.push(s1, s2, s3, s4, s5, s6, s7);
+    // let s1 = new Spring(n1, n2);
+    // let s2 = new Spring(n2, n4);
+    // let s3 = new Spring(n4, n3);
+    // let s4 = new Spring(n3, n1);
+    // let s5 = new Spring(n1, n4);
+    // let s6 = new Spring(n2, n3);
+    // let s7 = new Spring(n4, n5);
+    // springs.push(s1, s2, s3, s4, s5, s6, s7);
     
-    n5.frozen = true;
+    // n5.frozen = true;
 
     gravity = createVector(0, 0.05);
 }
@@ -77,8 +89,99 @@ function draw() {
     }
 
     avgFrames = avgFrames * AVG_WEIGHT + frameRate() * CURR_WEIGHT;
+    console.log(mode);
 }
 
+let firstNode = null;
+let secondNode = null;
+
+function mousePressed() {
+    const resetFirst = () => {
+        if (firstNode) firstNode.selected = false;
+        firstNode = null;
+    }
+    const resetSecond = () => {
+        if (secondNode) secondNode.selected = false;
+        secondNode = null;
+    }
+    const resetBoth = () => {
+        resetFirst();
+        resetSecond();
+    }
+    if (mode !== Mode.CREATE_SPRING) resetBoth();
+    let x = mouseX / GRID_WIDTH;
+    let y = mouseY / GRID_HEIGHT;
+    if (mode === Mode.CREATE_NODE) {
+        x = Math.round(x);
+        y = Math.round(y);
+    }
+    x *= GRID_WIDTH;
+    y *= GRID_HEIGHT;
+    let node = findNodeAtPosition(x, y);
+    switch (mode) {
+        case Mode.NONE:
+            break;
+        case Mode.CREATE_NODE:
+            if (dist(mouseX, mouseY, x, y) > POINT_SIZE) return; // Did not click on grid point
+            if (node === null) nodes.push(new Node(x, y));
+            break;
+        case Mode.FREEZE_NODE:
+            if (node !== null) node.frozen = !node.frozen;
+            break;
+        case Mode.CREATE_SPRING:
+            if (node === null) return;
+            if (node.equals(firstNode)) {
+                // unselect
+                resetFirst();
+                return;
+            }
+            if (node.equals(secondNode)) {
+                // unselect
+                resetSecond();
+                return;
+            }
+            node.selected = true;
+            if (firstNode === null) {
+                firstNode = node;
+                return;
+            }
+            if (secondNode === null) {
+                secondNode = node;
+            }
+            if (firstNode === null || secondNode === null) return;
+            else if (firstNode.equals(secondNode)) {
+                resetBoth();
+                return;
+            }
+            let s = new Spring(firstNode, secondNode);
+            for (let spr of springs) {
+                if (spr.equals(s)) {
+                    // Spring already exists
+                    resetBoth();
+                    return;
+                }
+            }
+            springs.push(s);
+            resetBoth();
+            break;
+        default:
+            console.warn("not implemented");
+    }
+}
+
+function findNodeAtPosition(x, y) {
+    let newNode = new Node(x, y);
+    console.log("new", x, y);
+    let node = null;
+    for (let n of nodes) {
+        console.log(n.position.x, n.position.y);
+        if (n.equals(newNode)) {
+            node = n;
+            break;
+        }
+    }
+    return node;
+}
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
@@ -89,4 +192,5 @@ function keyPressed() {
     if (MOVEMENT_KEYS.includes(key)) return; // reserved for other purposes, like eventually moving around
     else if (key == 'g') showGrid = !showGrid;
     else if (key == ' ') update = !update;
+    else if (key == 'p') mode = (mode + 1) % MODE_COUNT;
 }
