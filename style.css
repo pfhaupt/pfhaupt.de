@@ -8,8 +8,12 @@ canvas {
     display: block;
 }
   
-/* .no-list-decor{
+
+.no-list-decor{
     list-style: none;
+}
+.no-link-clicked-decor{
+
 }
 
 a{
@@ -27,10 +31,9 @@ body{
     font-family: monospace;
     font-size: 16pt;
 }
-
 li{
     margin-top: 10pt;
     font-style: italic;
     list-style: "/ ";
 
-} */
+}
