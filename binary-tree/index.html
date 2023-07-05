@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="html">
+    <head>
+        <script src="https://github.com/processing/p5.js/releases/download/v1.6.0/p5.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../style.css">
+        <meta charset="utf-8">
+        <title>Binary Search Tree</title>
+    </head>
+    <body>
+        <script src="node.js"></script>
+        <script src="tree.js"></script>
+        <script src="main.js"></script>
+        <p>
+            <label>
+                Please enter a number that should be added to the tree:
+                <input id="addElemInput" type="number" onkeypress="clickPress(event, 'addElemInput')"/>
+                <button onclick="addNumberToTree()">Add</button>
+            </label>
+        </p>
+        <p>
+            <label>
+                Please enter a number that should be searched in the tree:
+                <input id="searchElemInput" type="number" onkeypress="clickPress(event, 'searchElemInput')"/>
+                <button onclick="searchNumberInTree()">Search</button>
+            </label>
+        </p>
+        <p>
+            <p id="treeAsString"></p>
+            <p id="treeResult"></p>
+        </p>
+    </body>
+</html>
