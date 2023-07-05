@@ -21,8 +21,8 @@ class Node {
             this.velocity.mult(0.99); // Friction
             this.velocity.add(this.acceleration);
             this.position.add(this.velocity);
-            this.acceleration.mult(0);
         }
+        this.acceleration.mult(0);
     }
 
     draw(canvas) {
