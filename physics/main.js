@@ -2,8 +2,9 @@ let avgFrames = 0;
 const AVG_WEIGHT = 0.9;
 const CURR_WEIGHT = 1 - AVG_WEIGHT;
 
-let showGrid = true;
+let showGrid = false;
 let update = false;
+let showMenu = true;
 
 const GRID_WIDTH = 50;
 const GRID_HEIGHT = GRID_WIDTH;
@@ -57,8 +58,6 @@ function setup() {
 
 function draw() {
     background(0);
-    fill(lerpColor(color(255, 0, 0), color(0, 255, 0), avgFrames / getTargetFrameRate()));
-    text("FPS: " + nf(avgFrames, 0, 2), 0, 0);
     if (showGrid) {
         push();
         strokeWeight(POINT_SIZE);
@@ -88,8 +87,71 @@ function draw() {
         }
     }
 
+    if (showMenu) showStats();
+
     avgFrames = avgFrames * AVG_WEIGHT + frameRate() * CURR_WEIGHT;
-    console.log(mode);
+}
+
+function showStats() {
+    let str = [];
+    let y = textSize();
+    str.push("Show Grid: " + showGrid);
+    y += textSize();
+    str.push("Update: " + update);
+    y += textSize();
+    str.push("Mode: " + Object.keys(Mode)[mode]);
+    y += textSize();
+    switch (mode) {
+        case Mode.NONE: {
+            str.push("No mode active.");
+            break;
+        }
+        case Mode.CREATE_NODE: {
+            str.push("Click on the grid to place a Node.");
+            break;
+        }
+        case Mode.FREEZE_NODE: {
+            str.push("Click on a Node to (un-)freeze it.");
+            y += textSize();
+            str.push("Frozen Nodes are not affected by gravity.");
+            break;
+        }
+        case Mode.CREATE_SPRING: {
+            str.push("Click on a Node to select it as part of a Spring.");
+            y += textSize();
+            str.push("Click on another Node to create a Spring.");
+            break;
+        }
+        default: {
+            str.push("no text yet");
+        }
+    }
+    y += textSize();
+    str.push("");
+    y += textSize();
+    str.push("Press Space to enable/disable Updates.");
+    y += textSize();
+    str.push("Press `p` to switch between Modes.");
+    y += textSize();
+    str.push("Press `g` to show/hide the grid.");
+    y += textSize();
+    str.push("Press `h` to show/hide this Menu.");
+    y += textSize();
+
+    const alpha = 100;
+    push();
+    noStroke();
+    fill(255, alpha);
+    rect(0, 0, 400, y);
+    fill(lerpColor(color(255, 0, 0), color(0, 255, 0), avgFrames / getTargetFrameRate()));
+    text("FPS: " + nf(avgFrames, 0, 2), 0, 0);
+    fill(0);
+    y = textSize();
+    for (let s of str) {
+        text(s, 0, y);
+        y += textSize();
+    }
+    pop();
 }
 
 let firstNode = null;
@@ -193,4 +255,5 @@ function keyPressed() {
     else if (key == 'g') showGrid = !showGrid;
     else if (key == ' ') update = !update;
     else if (key == 'p') mode = (mode + 1) % MODE_COUNT;
+    else if (key == 'h') showMenu = !showMenu;
 }
