@@ -1,13 +1,5 @@
 const tree = new Tree();
 
-function setup() {
-    createCanvas(window.innerWidth, window.innerHeight);
-}
-
-function draw() {
-    background("#262626");
-}
-
 function getNumberInput(id) {
     let number = document.getElementById(id).value;
     if (number === '') return null;
