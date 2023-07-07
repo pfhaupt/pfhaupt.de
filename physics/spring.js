@@ -1,6 +1,6 @@
 
 class Spring {
-    constructor(nodeA, nodeB, defaultRate = 0.1) {
+    constructor(nodeA, nodeB, defaultRate = 5) {
         this.start = nodeA;
         this.end = nodeB;
         this.rate = defaultRate;
@@ -17,6 +17,7 @@ class Spring {
     update() {
         let force = p5.Vector.sub(this.end.position, this.start.position);
         let x = force.mag() - this.restLength;
+        x /= 10;
         force.normalize();
         force.mult(this.rate * x);
         this.start.applyForce(force);
