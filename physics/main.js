@@ -12,7 +12,7 @@ const POINT_SIZE = 10;
 
 const NODE_SIZE = 15;
 
-const UPDATE_COUNT = 10;
+const MS_PER_TICK = 5;
 
 const Mode = {
     NONE: 0,
@@ -34,7 +34,7 @@ function setup() {
     textAlign(LEFT, TOP);
     textSize(18);
 
-    // Hardcoded test - Next step: Click on grid to place Nodes
+    // Hardcoded test
     // let n1 = new Node(50, 50);
     // let n2 = new Node(100, 50);
     // let n3 = new Node(50, 100);
@@ -56,7 +56,9 @@ function setup() {
     gravity = createVector(0, 0.05);
 }
 
+let timeAccumulator = 0;
 function draw() {
+    if (update) timeAccumulator += deltaTime;
     background(0);
     if (showGrid) {
         push();
@@ -69,36 +71,37 @@ function draw() {
         }
         pop();
     }
+    
     for (let spring of springs) {
         spring.draw(this);
     }
     for (let node of nodes) {
         node.draw(this);
     }
-    if (update) {
-        for (let i = 0; i < UPDATE_COUNT; i++) {
-            for (let spring of springs) {
-                if (!spring.update()) {
-                    springs[springs.indexOf(spring)] = null;
-                }
+
+    while (timeAccumulator > MS_PER_TICK) {
+        for (let spring of springs) {
+            if (!spring.update()) {
+                springs[springs.indexOf(spring)] = null;
             }
-            springs.splice(0, springs.length,...springs.filter((s) => s !== null));
-            for (let node of nodes) {
-                node.applyForce(gravity);
-                if (!node.update()) {
-                    nodes[nodes.indexOf(node)] = null;
-                }
-            }
-            nodes.splice(0, nodes.length,...nodes.filter((n) => n !== null));
         }
+        springs.splice(0, springs.length,...springs.filter((s) => s !== null));
+        for (let node of nodes) {
+            node.applyForce(gravity);
+            if (!node.update()) {
+                nodes[nodes.indexOf(node)] = null;
+            }
+        }
+        nodes.splice(0, nodes.length,...nodes.filter((n) => n !== null));
+        timeAccumulator -= MS_PER_TICK;
     }
 
-    if (showMenu) showStats();
+    if (showMenu) showStats(deltaTime);
 
     avgFrames = avgFrames * AVG_WEIGHT + frameRate() * CURR_WEIGHT;
 }
 
-function showStats() {
+function showStats(deltaTime) {
     let str = [];
     let y = textSize();
     const appendStr = (s) => {
@@ -107,6 +110,7 @@ function showStats() {
     }
     appendStr("Show Grid: " + showGrid);
     appendStr("Update: " + update);
+    appendStr("Updates per frame: " + deltaTime / MS_PER_TICK);
     appendStr("Mode: " + Object.keys(Mode)[mode]);
     
     switch (mode) {
