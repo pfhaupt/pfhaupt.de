@@ -4,7 +4,6 @@ class Node {
         this.position = createVector(x, y);
         this.velocity = createVector(0, 0);
         this.acceleration = createVector(0, 0);
-        this.connected = [];
         this.frozen = false;
         this.selected = false; // for spring creation
         this.mass = mass;
@@ -23,6 +22,7 @@ class Node {
             this.position.add(this.velocity);
         }
         this.acceleration.mult(0);
+        return this.position.y <= 900;
     }
 
     draw(canvas) {

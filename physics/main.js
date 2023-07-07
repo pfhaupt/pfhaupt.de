@@ -20,7 +20,7 @@ const Mode = {
     FREEZE_NODE: 2,
     CREATE_SPRING: 3
 }
-const MODE_COUNT = 4;
+const MODE_COUNT = Object.keys(Mode).length;
 
 let mode = Mode.NONE;
 
@@ -78,12 +78,18 @@ function draw() {
     if (update) {
         for (let i = 0; i < UPDATE_COUNT; i++) {
             for (let spring of springs) {
-                spring.update();
+                if (!spring.update()) {
+                    springs[springs.indexOf(spring)] = null;
+                }
             }
+            springs.splice(0, springs.length,...springs.filter((s) => s !== null));
             for (let node of nodes) {
                 node.applyForce(gravity);
-                node.update();
+                if (!node.update()) {
+                    nodes[nodes.indexOf(node)] = null;
+                }
             }
+            nodes.splice(0, nodes.length,...nodes.filter((n) => n !== null));
         }
     }
 
@@ -95,48 +101,43 @@ function draw() {
 function showStats() {
     let str = [];
     let y = textSize();
-    str.push("Show Grid: " + showGrid);
-    y += textSize();
-    str.push("Update: " + update);
-    y += textSize();
-    str.push("Mode: " + Object.keys(Mode)[mode]);
-    y += textSize();
+    const appendStr = (s) => {
+        str.push(s);
+        y = y + textSize();
+    }
+    appendStr("Show Grid: " + showGrid);
+    appendStr("Update: " + update);
+    appendStr("Mode: " + Object.keys(Mode)[mode]);
+    
     switch (mode) {
         case Mode.NONE: {
-            str.push("No mode active.");
+            appendStr("No mode active.");
             break;
         }
         case Mode.CREATE_NODE: {
-            str.push("Click on the grid to place a Node.");
+            appendStr("Click on the grid to place a Node.");
             break;
         }
         case Mode.FREEZE_NODE: {
-            str.push("Click on a Node to (un-)freeze it.");
-            y += textSize();
-            str.push("Frozen Nodes are not affected by gravity.");
+            appendStr("Click on a Node to (un-)freeze it.");
+            appendStr("Frozen Nodes are not affected by gravity.");
             break;
         }
         case Mode.CREATE_SPRING: {
-            str.push("Click on a Node to select it as part of a Spring.");
-            y += textSize();
-            str.push("Click on another Node to create a Spring.");
+            appendStr("Click on a Node to select it as part of a Spring.");
+            appendStr("Click on another Node to create a Spring.");
             break;
         }
         default: {
-            str.push("no text yet");
+            appendStr("no text yet");
         }
     }
-    y += textSize();
-    str.push("");
-    y += textSize();
-    str.push("Press Space to enable/disable Updates.");
-    y += textSize();
-    str.push("Press `p` to switch between Modes.");
-    y += textSize();
-    str.push("Press `g` to show/hide the grid.");
-    y += textSize();
-    str.push("Press `h` to show/hide this Menu.");
-    y += textSize();
+    
+    appendStr("");
+    appendStr("Press Space to enable/disable Updates.");
+    appendStr("Press `p` to switch between Modes.");
+    appendStr("Press `g` to show/hide the grid.");
+    appendStr("Press `h` to show/hide this Menu.");
 
     const alpha = 100;
     push();
@@ -233,10 +234,8 @@ function mousePressed() {
 
 function findNodeAtPosition(x, y) {
     let newNode = new Node(x, y);
-    console.log("new", x, y);
     let node = null;
     for (let n of nodes) {
-        console.log(n.position.x, n.position.y);
         if (n.equals(newNode)) {
             node = n;
             break;

@@ -3,8 +3,6 @@ class Spring {
     constructor(nodeA, nodeB, defaultRate = 0.1) {
         this.start = nodeA;
         this.end = nodeB;
-        nodeA.connected.push(nodeB);
-        nodeB.connected.push(nodeA);
         this.rate = defaultRate;
         this.restLength = dist(this.start.position.x, this.start.position.y, this.end.position.x, this.end.position.y);
     }
@@ -24,6 +22,7 @@ class Spring {
         this.start.applyForce(force);
         force.mult(-1);
         this.end.applyForce(force);
+        return nodes.indexOf(this.start) !== -1 && nodes.indexOf(this.end) !== -1;
     }
 
     equals(other) {
