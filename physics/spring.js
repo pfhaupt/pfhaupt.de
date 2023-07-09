@@ -21,15 +21,14 @@ class Spring {
     update() {
         let force = p5.Vector.sub(this.end.position, this.start.position);
         let fMag = force.mag();
-        let x = fMag - this.restLength;
-        x /= 10;
+        let x = (fMag - this.restLength) / 10;
         force.normalize();
         force.mult(this.rate * x);
         this.stress = 100 * force.mag() / this.area;
-        if (this.stress > 1.5) return false;
         this.start.applyForce(force);
         force.mult(-1);
         this.end.applyForce(force);
+        if (this.stress > 1.5) return false;
         return nodes.indexOf(this.start) !== -1 && nodes.indexOf(this.end) !== -1;
     }
 
@@ -41,5 +40,9 @@ class Spring {
         if (option1) return true;
         let option2 = this.start.equals(other.end) && this.end.equals(other.start);
         return option2;
+    }
+
+    contains(node) {
+        return this.start.equals(node) || this.end.equals(node);
     }
 }

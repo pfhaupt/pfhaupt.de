@@ -12,7 +12,7 @@ const POINT_SIZE = 10;
 
 const NODE_SIZE = 15;
 
-const MS_PER_TICK = 5;
+const MS_PER_TICK = 1;
 
 const Mode = {
     NONE: 0,
@@ -35,23 +35,23 @@ function setup() {
     textSize(18);
 
     // Hardcoded test
-    // let n1 = new Node(50, 50);
-    // let n2 = new Node(100, 50);
-    // let n3 = new Node(50, 100);
-    // let n4 = new Node(100, 100);
-    // let n5 = new Node(300, 300);
-    // nodes.push(n1, n2, n3, n4, n5);
+    let n1 = new Node(50, 50);
+    let n2 = new Node(100, 50);
+    let n3 = new Node(50, 100);
+    let n4 = new Node(100, 100);
+    let n5 = new Node(300, 300);
+    nodes.push(n1, n2, n3, n4, n5);
 
-    // let s1 = new Spring(n1, n2);
-    // let s2 = new Spring(n2, n4);
-    // let s3 = new Spring(n4, n3);
-    // let s4 = new Spring(n3, n1);
-    // let s5 = new Spring(n1, n4);
-    // let s6 = new Spring(n2, n3);
-    // let s7 = new Spring(n4, n5);
-    // springs.push(s1, s2, s3, s4, s5, s6, s7);
-    
-    // n5.frozen = true;
+    let s1 = new Spring(n1, n2);
+    let s2 = new Spring(n2, n4);
+    let s3 = new Spring(n4, n3);
+    let s4 = new Spring(n3, n1);
+    let s5 = new Spring(n1, n4);
+    let s6 = new Spring(n2, n3);
+    let s7 = new Spring(n4, n5);
+    springs.push(s1, s2, s3, s4, s5, s6, s7);
+
+    n5.frozen = true;
 
     gravity = createVector(0, 0.05);
 }
@@ -87,6 +87,7 @@ function draw() {
         }
         springs.splice(0, springs.length,...springs.filter((s) => s !== null));
         for (let node of nodes) {
+            node.checkCollision(springs);
             node.applyForce(gravity);
             if (!node.update()) {
                 nodes[nodes.indexOf(node)] = null;
